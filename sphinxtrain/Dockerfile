@@ -9,11 +9,19 @@ RUN mv /sphinx/${SPHINXTRAIN} /sphinx/sphinxtrain
 
 WORKDIR /sphinx/sphinxtrain
 
-RUN \
-./configure && \
-make && \
-make check && \
-make installcheck
+RUN echo "==> Updating and installing packages" && \
+    apt-get update && \
+    apt-get install -y build-essential gcc automake autoconf libtool && \
+    echo "==> Installing Sphinx" && \
+    ./configure && \
+    make && \
+    make check && \
+    echo "==> Verifying Install" && \
+    make installcheck && \
+    echo "==> Cleaning Up" && \
+    rm -rf /var/lib/{apt,dpkg,cache,log} && \
+    apt-get remove -y --auto-remove build-essential gcc automake autoconf libtool && \
+    apt-get clean
 
 WORKDIR /data
 

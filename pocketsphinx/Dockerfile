@@ -9,12 +9,20 @@ RUN mv /sphinx/${POCKETSPHINX} /sphinx/pocketsphinx
 
 WORKDIR /sphinx/pocketsphinx
 
-RUN \
-./configure --with-swig-python && \
-make && \
-make check && \
-make install && \
-make installcheck
+RUN echo "==> Updating and installing packages" && \
+    apt-get update && \
+    apt-get install -y build-essential gcc automake autoconf libtool && \
+    echo "==> Installing Sphinx" && \
+    ./configure --with-swig-python && \
+    make && \
+    make check && \
+    make install && \
+    echo "==> Verifying Install" && \
+    make installcheck && \
+    echo "==> Cleaning Up" && \
+    rm -rf /var/lib/{apt,dpkg,cache,log} && \
+    apt-get remove -y --auto-remove build-essential gcc automake autoconf libtool && \
+    apt-get clean
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
